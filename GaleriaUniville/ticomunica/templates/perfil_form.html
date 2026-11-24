@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block titulo %}{{ 'Cadastro' if modo == 'cadastro' else 'Editar perfil' }} · Galeria Univille{% endblock %}
+
+{% block conteudo %}
+<form class="perfil-form" method="post" enctype="multipart/form-data"
+      action="{{ url_for('cadastro') if modo == 'cadastro' else url_for('perfil_editar') }}">
+
+  <h1>{{ 'Cadastro' if modo == 'cadastro' else 'Editar Perfil' }}</h1>
+
+  {% if erros %}
+    <ul class="erros" role="alert">{% for e in erros %}<li>{{ e }}</li>{% endfor %}</ul>
+  {% endif %}
+
+  <div class="perfil-form__foto">
+    <label class="foto-circulo" for="foto">
+      <img id="foto-preview" alt=""
+           {% if foto_atual %}src="{{ url_for('static', filename='uploads/' ~ foto_atual) }}"{% else %}hidden{% endif %}>
+      <span id="foto-texto" {% if foto_atual %}hidden{% endif %}>{{ 'Editar Foto' if modo == 'editar' else 'Adicionar Foto' }}</span>
+    </label>
+    <input type="file" id="foto" name="foto" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+    <label class="pill" for="foto">Escolher Foto</label>
+  </div>
+
+  <div class="perfil-form__campos">
+    <label class="campo">
+      <span>Nome</span>
+      <input type="text" name="nome" value="{{ v.get('nome') or '' }}" maxlength="120" placeholder="Seu nome ou nome artístico" required>
+    </label>
+
+    <label class="campo">
+      <span>Sobre você</span>
+      <textarea name="bio" rows="4" maxlength="2000" placeholder="Insira aqui sua história, inspirações, como você cria e passe a sua visão">{{ v.get('bio') or '' }}</textarea>
+    </label>
+
+    <fieldset class="grupo">
+      <legend>Vínculo com a Univille</legend>
+      {% for chave, rotulo in vinculos.items() %}
+        <label class="pill-check"><input type="radio" name="vinculo" value="{{ chave }}" {{ 'checked' if v.get('vinculo') == chave }}><span>{{ rotulo }}</span></label>
+      {% endfor %}
+    </fieldset>
+
+    <div class="linha">
+      <label class="campo campo--linha">
+        <span>Curso</span>
+        <input type="text" name="curso" value="{{ v.get('curso') or '' }}" maxlength="120" placeholder="Artes Visuais">
+      </label>
+      <label class="campo campo--linha campo--curto">
+        <span>Período</span>
+        <input type="text" name="periodo" value="{{ v.get('periodo') or '' }}" maxlength="20" placeholder="5" inputmode="numeric">
+      </label>
+    </div>
+
+    <fieldset class="grupo">
+      <legend>Linguagem Artística (quantas quiser)</legend>
+      {% for chave, rotulo in linguagens %}
+        <label class="pill-check"><input type="checkbox" name="linguagens" value="{{ chave }}" {{ 'checked' if chave in sel }}><span>{{ rotulo }}</span></label>
+      {% endfor %}
+    </fieldset>
+
+    {% if modo == 'cadastro' %}
+    <fieldset class="grupo grupo--acesso">
+      <legend>Dados de acesso</legend>
+      <div class="linha">
+        <label class="campo campo--linha"><span>E-mail de acesso</span>
+          <input type="email" name="email" value="{{ v.get('email') or '' }}" autocomplete="username" required></label>
+      </div>
+      <div class="linha">
+        <label class="campo campo--linha"><span>Senha (mín. 6 caracteres)</span>
+          <input type="password" name="senha" minlength="6" autocomplete="new-password" required></label>
+        <label class="campo campo--linha"><span>Repita a senha</span>
+          <input type="password" name="senha2" minlength="6" autocomplete="new-password" required></label>
+      </div>
+    </fieldset>
+    {% endif %}
+
+    <label class="interruptor">
+      <input type="checkbox" name="perfil_publico" value="1" {{ 'checked' if v.get('perfil_publico') }}>
+      <span>Perfil visível para todos (aparece em “Artistas”, nas categorias e na busca)</span>
+    </label>
+
+    <button type="submit" class="botao-escuro botao-enviar">{{ 'CRIAR CADASTRO' if modo == 'cadastro' else 'SALVAR ALTERAÇÕES' }}</button>
+    {% if modo == 'editar' %}
+      <a class="link-seta" href="{{ url_for('meu_perfil') }}">Cancelar</a>
+    {% else %}
+      <p class="dica">Já tem conta? <a class="link-seta" href="{{ url_for('login') }}">Entrar →</a></p>
+    {% endif %}
+  </div>
+
+  <aside class="perfil-form__contatos">
+    <label class="campo">
+      <span>Instagram (ou outro link)</span>
+      <input type="text" name="instagram_url" value="{{ v.get('instagram_url') or '' }}" maxlength="500" placeholder="https://instagram.com/seu_usuario" inputmode="url">
+    </label>
+    <label class="campo">
+      <span>E-mail de contato</span>
+      <input type="email" name="contato_email" value="{{ v.get('contato_email') or '' }}" maxlength="160" placeholder="seu@email.com">
+    </label>
+    <label class="campo">
+      <span>Contato</span>
+      <input type="text" name="contato" value="{{ v.get('contato') or '' }}" maxlength="160" placeholder="(47) 99999-0000">
+    </label>
+  </aside>
+</form>
+{% endblock %}

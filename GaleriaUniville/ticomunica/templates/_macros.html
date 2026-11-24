@@ -1,0 +1,43 @@
+{# Foto redonda do artista; sem foto, mostra a inicial do nome #}
+{% macro avatar(a, tamanho="") %}
+  {% if a.foto %}
+    <img class="avatar {{ tamanho }}" src="{{ url_for('static', filename='uploads/' ~ a.foto) }}" alt="{{ a.nome }}">
+  {% else %}
+    <span class="avatar avatar--vazio {{ tamanho }}" aria-hidden="true">{{ a.nome[:1]|upper }}</span>
+  {% endif %}
+{% endmacro %}
+
+{# Obra: clicar abre o pop-up com os detalhes (o JavaScript lê os data-*).
+   modo="grade": usa o molde escolhido pelo artista; modo="filme": faixa larga com legenda. #}
+{% macro obra_item(o, modo="grade", dono=False) %}
+  <div class="obra-item {{ 'molde-' ~ o.molde if modo == 'grade' else 'filme' }}">
+    <button type="button" class="obra" data-obra
+            data-titulo="{{ o.titulo }}"
+            data-artista="{{ o.artista_nome }}"
+            data-artista-url="{{ url_for('artista', artista_id=o.artista_id) }}"
+            data-ano="{{ o.ano }}"
+            data-categoria="{{ categorias[o.categoria].titulo }}"
+            data-descricao="{{ o.descricao }}"
+            data-imagem="{{ url_for('static', filename='uploads/' ~ o.imagem) }}"
+            data-video="{{ o.video }}"
+            data-detalhes='{{ o.lista_detalhes|tojson }}'>
+      <img src="{{ url_for('static', filename='uploads/' ~ o.imagem) }}" alt="{{ o.titulo }}" loading="lazy">
+      {% if o.video %}<span class="play" aria-hidden="true"></span>{% endif %}
+      {% if modo == "filme" %}
+        <span class="obra__legenda">
+          <strong>{{ o.titulo }}</strong>
+          <small>{{ o.artista_nome }} - {{ o.ano }}</small>
+        </span>
+      {% endif %}
+    </button>
+    {% if dono %}
+      <div class="obra-acoes">
+        <a href="{{ url_for('obra_editar', obra_id=o.id) }}">Editar</a>
+        <form method="post" action="{{ url_for('obra_excluir', obra_id=o.id) }}"
+              data-confirmar="Excluir a obra “{{ o.titulo }}”? Esta ação não pode ser desfeita.">
+          <button type="submit">Excluir</button>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+{% endmacro %}

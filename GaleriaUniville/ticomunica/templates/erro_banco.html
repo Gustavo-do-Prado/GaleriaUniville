@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block titulo %}Erro de banco de dados · Galeria Univille{% endblock %}
+{% block conteudo %}
+<section class="cabecalho-pagina">
+  <h1>Banco de dados</h1>
+  <p>Não foi possível usar o MySQL. Confira se o servidor está ligado, se o <code>schema.sql</code> foi executado
+     e se usuário e senha em <code>db.py</code> estão corretos.</p>
+</section>
+<p class="vazio"><code>{{ detalhe }}</code></p>
+{% endblock %}

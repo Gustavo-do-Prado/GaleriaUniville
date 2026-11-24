@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% from "_macros.html" import avatar, obra_item with context %}
+{% block titulo %}Busca · Galeria Univille{% endblock %}
+
+{% block conteudo %}
+<section class="cabecalho-pagina">
+  <h1>Busca</h1>
+  <p>{% if q %}Resultados para “{{ q }}”{% else %}Digite o nome de um artista ou de uma obra.{% endif %}</p>
+</section>
+
+{% if q and not achados and not obras %}
+  <p class="vazio">Nada encontrado.</p>
+{% endif %}
+
+{% if achados %}
+  <ul class="lista-artistas">
+    {% for a in achados %}
+      <li>
+        {{ avatar(a) }}
+        <div class="lista-artistas__nome"><h2>{{ a.nome|upper }}</h2><p>{{ papel(a) }}</p></div>
+        <a class="botao-escuro" href="{{ url_for('artista', artista_id=a.id) }}">VER PERFIL DO ARTISTA</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if obras %}
+  <section class="grade-obras busca-obras">
+    {% for o in obras %}{{ obra_item(o) }}{% endfor %}
+  </section>
+{% endif %}
+{% endblock %}

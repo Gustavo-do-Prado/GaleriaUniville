@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% from "_macros.html" import obra_item with context %}
+{% block titulo %}{{ cat.titulo }} · Galeria Univille{% endblock %}
+
+{% block conteudo %}
+<section class="cabecalho-pagina">
+  <h1>{{ cat.titulo }}</h1>
+  <p>{{ cat.intro }}</p>
+</section>
+
+{% if not obras %}
+  <p class="vazio">Ainda não há obras nesta categoria.</p>
+{% elif cat.layout == "filmes" %}
+  <section class="filmes">
+    {% for o in obras %}{{ obra_item(o, modo="filme") }}{% endfor %}
+  </section>
+{% else %}
+  <section class="grade-obras">
+    {% for o in obras %}{{ obra_item(o) }}{% endfor %}
+  </section>
+{% endif %}
+{% endblock %}

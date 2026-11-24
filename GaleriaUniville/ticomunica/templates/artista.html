@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% from "_macros.html" import avatar, obra_item with context %}
+{% block titulo %}{{ a.nome }} · Galeria Univille{% endblock %}
+
+{% block conteudo %}
+{% if dono and not a.perfil_publico %}
+  <p class="aviso-perfil">Seu perfil está <strong>oculto</strong>: só você consegue vê-lo. Para aparecer para os visitantes,
+    <a href="{{ url_for('perfil_editar') }}">edite o perfil</a> e marque “Perfil visível para todos”.</p>
+{% endif %}
+
+<section class="perfil">
+  {{ avatar(a, "avatar--grande") }}
+
+  <div class="perfil__texto">
+    <h1>{{ a.nome|upper }}</h1>
+    {% if a.bio %}<p class="perfil__bio">{{ a.bio }}</p>{% endif %}
+    {% set meta = linha_curso(a) %}
+    {% if meta %}<p class="perfil__meta">{{ meta }}</p>{% endif %}
+    {% if ling %}
+      <p class="perfil__ling">
+        {% for chave, rotulo in linguagens if chave in ling %}{{ rotulo }}{% if not loop.last %} · {% endif %}{% endfor %}
+      </p>
+    {% endif %}
+    {% if dono %}
+      <div class="perfil__acoes">
+        <a class="pill" href="{{ url_for('perfil_editar') }}">Editar</a>
+        <a class="pill" href="{{ url_for('obra_nova') }}">+ Obra</a>
+      </div>
+    {% endif %}
+  </div>
+
+  {% if a.instagram_url or a.contato_email or a.contato %}
+  <ul class="perfil__contatos">
+    {% if a.instagram_url %}<li><a href="{{ a.instagram_url }}" target="_blank" rel="noopener noreferrer">Instagram</a></li>{% endif %}
+    {% if a.contato_email %}<li><a href="mailto:{{ a.contato_email }}">E-mail</a></li>{% endif %}
+    {% if a.contato %}<li>{{ a.contato }}</li>{% endif %}
+  </ul>
+  {% endif %}
+</section>
+
+<section class="obras-perfil">
+  <h2 class="titulo-sublinhado">Obras</h2>
+
+  {% if usadas|length > 1 %}
+  <div class="filtros" role="group" aria-label="Filtrar obras">
+    <a class="pill {{ 'ativo' if filtro == 'todas' }}" href="{{ url_for('artista', artista_id=a.id) }}">Todas</a>
+    {% for chave in usadas %}
+      <a class="pill {{ 'ativo' if filtro == chave }}" href="{{ url_for('artista', artista_id=a.id, cat=chave) }}">{{ categorias[chave].filtro }}</a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if obras %}
+    <div class="grade-obras">
+      {% for o in obras %}{{ obra_item(o, dono=dono) }}{% endfor %}
+    </div>
+  {% elif dono and total == 0 %}
+    <p class="vazio">Você ainda não publicou nenhuma obra.
+      <a class="link-seta" href="{{ url_for('obra_nova') }}">Publicar a primeira →</a></p>
+  {% else %}
+    <p class="vazio">Nenhuma obra nesta categoria.</p>
+  {% endif %}
+</section>
+{% endblock %}

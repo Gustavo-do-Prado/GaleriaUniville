@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block titulo %}{{ 'Nova obra' if modo == 'nova' else 'Editar obra' }} · Galeria Univille{% endblock %}
+
+{% block conteudo %}
+{% set molde_atual = v.get('molde') or 'pequeno-retrato' %}
+<form id="form-obra" class="obra-form" method="post" enctype="multipart/form-data"
+      action="{{ url_for('obra_nova') if modo == 'nova' else url_for('obra_editar', obra_id=obra.id) }}"
+      data-moldes='{{ moldes_js|tojson }}'>
+
+  <h1>{{ 'Nova obra' if modo == 'nova' else 'Editar obra' }}</h1>
+
+  {% if erros %}
+    <ul class="erros" role="alert">{% for e in erros %}<li>{{ e }}</li>{% endfor %}</ul>
+  {% endif %}
+
+  <label class="campo">
+    <span>Imagem da obra{% if modo == 'editar' %} (deixe em branco para manter a atual){% endif %}</span>
+    <input type="file" id="imagem" name="imagem" accept="image/png,image/jpeg,image/webp,image/gif" {{ 'required' if modo == 'nova' }}>
+  </label>
+
+  <fieldset class="grupo">
+    <legend>Molde da imagem na sua página</legend>
+    <p class="dica">Escolha o tamanho e o formato que a imagem vai ocupar na galeria. Ao selecionar a imagem, sugerimos o molde mais parecido com a proporção dela, mas você pode trocar.</p>
+    <div class="moldes">
+      {% for chave, m in moldes.items() %}
+        <label class="molde-opcao">
+          <input type="radio" name="molde" value="{{ chave }}" data-rotulo="{{ m.rotulo }}" {{ 'checked' if molde_atual == chave }}>
+          <span class="molde-caixa"><span class="molde-mini" style="width: {{ (m.colunas / 12 * 100)|round(1) }}%; aspect-ratio: {{ m.w }} / {{ m.h }};"></span></span>
+          <span class="molde-nome">{{ m.rotulo }}</span>
+        </label>
+      {% endfor %}
+    </div>
+    <p id="molde-sugerido" class="dica" hidden></p>
+  </fieldset>
+
+  <div class="previa">
+    <p class="dica">Pré-visualização (a proporção em relação à largura da página é a mesma da galeria)</p>
+    <div class="grade-obras previa-grade">
+      <div id="previa-item" class="obra-item molde-{{ molde_atual }}">
+        <img id="previa-img" alt="" {% if imagem_atual %}src="{{ url_for('static', filename='uploads/' ~ imagem_atual) }}"{% else %}hidden{% endif %}>
+        <span id="previa-vazia" class="previa-vazia" {% if imagem_atual %}hidden{% endif %}>Selecione uma imagem</span>
+      </div>
+    </div>
+  </div>
+
+  <label class="campo">
+    <span>Título da obra</span>
+    <input type="text" name="titulo" value="{{ v.get('titulo') or '' }}" maxlength="160" required>
+  </label>
+
+  <label class="campo campo--curto">
+    <span>Ano</span>
+    <input type="number" name="ano" value="{{ v.get('ano') or '' }}" min="1900" max="2100" required>
+  </label>
+
+  <fieldset class="grupo">
+    <legend>Tipo de arte</legend>
+    {% for chave, c in categorias.items() %}
+      <label class="pill-check"><input type="radio" name="categoria" value="{{ chave }}" {{ 'checked' if v.get('categoria') == chave }} required><span>{{ c.titulo }}</span></label>
+    {% endfor %}
+    <p class="dica" id="dica-categoria" hidden>Escolha o tipo de arte para ver os campos específicos.</p>
+  </fieldset>
+
+  {% for chave, c in categorias.items() %}
+    <div class="grupo-categoria" data-categoria="{{ chave }}" {% if v.get('categoria') and v.get('categoria') != chave %}hidden{% endif %}>
+      <h2 class="subtitulo">Detalhes · {{ c.titulo }}</h2>
+      {% for f in c.campos %}
+        <label class="campo">
+          <span>{{ f.rotulo }}{% if not f.obrigatorio %} (opcional){% endif %}</span>
+          {% if f.tipo == 'longo' %}
+            <textarea name="det-{{ chave }}-{{ f.nome }}" rows="3" maxlength="500" placeholder="{{ f.placeholder }}" {{ 'required' if f.obrigatorio }}>{{ v.get('det-' ~ chave ~ '-' ~ f.nome) or '' }}</textarea>
+          {% else %}
+            <input type="text" name="det-{{ chave }}-{{ f.nome }}" value="{{ v.get('det-' ~ chave ~ '-' ~ f.nome) or '' }}" maxlength="500" placeholder="{{ f.placeholder }}" {{ 'inputmode=url' if f.tipo == 'url' }} {{ 'required' if f.obrigatorio }}>
+          {% endif %}
+        </label>
+      {% endfor %}
+    </div>
+  {% endfor %}
+
+  <label class="campo">
+    <span>Sobre a obra</span>
+    <textarea name="descricao" rows="5" maxlength="2000" placeholder="Conte a ideia, o processo ou o contexto desta obra." required>{{ v.get('descricao') or '' }}</textarea>
+  </label>
+
+  <div class="obra-form__botoes">
+    <button type="submit" class="botao-escuro botao-enviar">{{ 'PUBLICAR OBRA' if modo == 'nova' else 'SALVAR ALTERAÇÕES' }}</button>
+    <a class="link-seta" href="{{ url_for('meu_perfil') }}">Cancelar</a>
+  </div>
+</form>
+{% endblock %}

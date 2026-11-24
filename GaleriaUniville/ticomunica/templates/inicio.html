@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% from "_macros.html" import avatar with context %}
+{% block titulo %}Galeria Univille{% endblock %}
+
+{% block conteudo %}
+<section class="hero">
+  <h1>Galeria<br>Univille</h1>
+  <p>Uma vitrine para os artistas que emergem desta instituição — trabalhos que desafiam, questionam e celebram.
+     Cada obra aqui reunida é resultado de anos de dedicação e de uma busca singular por voz própria.</p>
+</section>
+
+<section class="categorias-home" aria-label="Categorias">
+    {% set imagens = {
+      'Artes Plásticas': 'ArtesPlasticasCardInicio.png',
+      'Fotografia': 'FotografiaCardInicio.png',
+      'Escultura': 'EsculturaCardInicio.png',
+      'Cinema': 'CinemaCardInicio.png'
+  } %}
+
+  {% for chave, c in categorias.items() %}
+    <a class="categoria-card" href="{{ url_for('categoria', chave=chave) }}">
+
+      <img src="{{ url_for('static', filename='uploads/categorias/' ~ imagens[c.titulo]) }}"
+           alt="{{ c.titulo }}"
+           loading="lazy">
+
+      <span>{{ c.titulo }}</span>
+
+    </a>
+  {% endfor %}
+
+</section>
+
+
+<section class="destaque">
+  <h2>Artista em destaque</h2>
+  <div class="destaque__card">
+      <img class="destaque__foto" src="{{ url_for('static', filename='uploads/destaque/FotoPassocaCapa.jpeg') }}">
+    <div class="destaque__info">
+      <h3>PASSOCA</h3>
+      <p>Artes Visuais</p>
+        <img class="destaque__obra" src="{{ url_for('static', filename='uploads/destaque/CegueiraAzulCapa.jpeg') }}">
+        <p>Cegueira Azul (2026)</p>
+      <a class="link-seta" href="{{ url_for('artista', artista_id=2) }}">Conhecer o artista →</a>
+    </div>
+  </div>
+</section>
+<!--<p class="vazio">Ainda não há artistas com obras publicadas.
+  <a class="link-seta" href="{{ url_for('cadastro') }}">Cadastre-se e publique a sua →</a></p>*/ -->
+{% endblock %}

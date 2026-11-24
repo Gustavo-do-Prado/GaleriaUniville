@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from "_macros.html" import avatar with context %}
+{% block titulo %}Artistas · Galeria Univille{% endblock %}
+
+{% block conteudo %}
+<section class="cabecalho-pagina">
+  <h1>Artistas</h1>
+  <p>Conheça quem dá vida à Galeria Univille.</p>
+</section>
+
+{% if not artistas %}
+  <p class="vazio">Nenhum artista com perfil público ainda.
+    <a class="link-seta" href="{{ url_for('cadastro') }}">Seja o primeiro →</a></p>
+{% else %}
+<ul class="lista-artistas">
+  {% for a in artistas %}
+    <li>
+      {{ avatar(a) }}
+      <div class="lista-artistas__nome">
+        <h2>{{ a.nome|upper }}</h2>
+        <p>{{ papel(a) }}</p>
+      </div>
+      <a class="botao-escuro" href="{{ url_for('artista', artista_id=a.id) }}">VER PERFIL DO ARTISTA</a>
+    </li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}
