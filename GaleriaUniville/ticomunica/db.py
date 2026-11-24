@@ -11,7 +11,7 @@ CONFIG = {
     "host": "localhost",
     "port": 3306,
     "user": "root",
-    "password": "123456",  # <- coloque aqui a senha do seu MySQL
+    "password": "",  # <- coloque aqui a senha do seu MySQL
     "database": "galeria_univille",
     "charset": "utf8mb4",
 }
